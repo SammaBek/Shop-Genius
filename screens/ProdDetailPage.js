@@ -1,15 +1,33 @@
 import React from "react";
-import { View, Text, Image, Pressable, ScrollView } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  ScrollView,
+  Modal,
+  KeyboardAvoidingView,
+} from "react-native";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  NavigationContainer,
+  useRoute,
+  useNavigation,
+} from "@react-navigation/native";
+
+import SendMessageScreen from "./SendMessageScreen";
 
 import tw from "twrnc";
 
 function ProdDetailPage() {
   const Route = useRoute();
   const [indexPic, setIndexPic] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const userId = useSelector((state) => state.sign.userId);
+  const navigation = useNavigation();
 
   function pressHandler(direction) {
     const count = data.image.length;
@@ -25,6 +43,24 @@ function ProdDetailPage() {
   const data = Route.params.data;
   const key = Object.keys(data.specs);
   console.log(key);
+
+  console.log("Here is the date");
+  console.log(data);
+
+  function chatShowHandler() {
+    // setModalVisible(true);
+    navigation.navigate("MessageNav", {
+      params: {
+        data: {
+          name: data.owner.userName,
+          bidder: data.owner.id,
+          userId: userId,
+        },
+      },
+      screen: "Message",
+    });
+  }
+
   return (
     <>
       <StatusBar animated style="light" />
@@ -33,7 +69,7 @@ function ProdDetailPage() {
           <Image
             className="object-fit mx-auto  w-[95%] h-[90%] rounded-lg "
             source={{
-              uri: `https://gabaa-app-resource.s3.amazonaws.com/${data.image[indexPic]}`,
+              uri: `https://52c35cf06edf44f062b0.ucr.io/-/preview/1080x1920/-/format/webp/-/quality/smart_retina/https://gabaa-app-resource.s3.amazonaws.com/${data.image[indexPic]}`,
             }}
           />
         </View>
@@ -96,10 +132,30 @@ function ProdDetailPage() {
           <Pressable className="w-[30%] bg-cyan-900 rounded-lg py-1">
             <Text className="text-lg text-center text-white">Call</Text>
           </Pressable>
-          <Pressable className="w-[30%] bg-cyan-900 rounded-lg py-1">
+          <Pressable
+            onPress={chatShowHandler}
+            className="w-[30%] bg-cyan-900 rounded-lg py-1"
+          >
             <Text className="text-lg text-center text-white">Chat</Text>
           </Pressable>
         </View>
+
+        {/* <Modal animationType="slide" visible={modalVisible} transparent={true}>
+          <Pressable
+            onPress={() => setModalVisible(false)}
+            className="flex-1"
+          ></Pressable>
+
+          <View className=" rounded-xl absolute bottom-0 w-[100%] pt-2 h-[80%] bg-gray-900">
+            <View>
+              <SendMessageScreen
+                name={data.owner.userName}
+                bidder={data.owner.id}
+                userId={userId}
+              />
+            </View>
+          </View>
+        </Modal> */}
       </ScrollView>
     </>
   );

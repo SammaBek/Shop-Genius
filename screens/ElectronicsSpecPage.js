@@ -9,12 +9,26 @@ import {
   PhoneStorage,
   PhoneType,
 } from "../components/electronicsComp/PhoneSpecComp";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-function ElectronicsSpecPage() {
-  const [elecType, setElecType] = useState("Electronic Type");
+function ElectronicsSpecPage(props) {
+  const [elecType, setElecType] = useState(
+    `${props.prodSpec ? props.prodSpec.ElectronicType : ""}`
+  );
   const [modalVisible, setModalVisible] = useState(false);
+  const [phoneSpec, setPhoneSpec] = useState();
+
+  useEffect(() => {
+    if (phoneSpec && elecType) {
+      console.log("Phone Spec Here");
+      console.log(phoneSpec);
+      props.setProdSpec({
+        ...phoneSpec,
+        ElectronicType: elecType,
+      });
+    }
+  }, [phoneSpec, elecType]);
 
   function ElecPicker() {
     return (
@@ -50,7 +64,10 @@ function ElectronicsSpecPage() {
         </View>
         {elecType === "Phone" && (
           <View>
-            <PhoneSpecPage />
+            <PhoneSpecPage
+              phoneSpec={props.prodSpec}
+              setPhoneSpec={setPhoneSpec}
+            />
           </View>
         )}
         {elecType === "TV" && (

@@ -2,6 +2,7 @@ import { Pressable, Text, View, Modal, TextInput } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
   Make,
   Fuel,
@@ -18,7 +19,7 @@ function VehiclesSpecPage() {
   const [modalName, setModalName] = useState(undefined);
 
   return (
-    <View className="">
+    <KeyboardAwareScrollView className="">
       <Text className="mt-16 text-xl font-bold text-center text-gray-100">
         Vehicles Specificatioin
       </Text>
@@ -109,7 +110,7 @@ function VehiclesSpecPage() {
           )}
         </View>
       </Modal>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 

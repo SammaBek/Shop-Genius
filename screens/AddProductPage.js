@@ -17,6 +17,8 @@ import CategoryComp from "../components/CategoryComp";
 import VehiclesSpecPage from "./VehiclesSpecPage";
 import ElectronicsSpecPage from "./ElectronicsSpecPage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 function AddProductPage() {
   const [radio, setRadio] = useState("New");
@@ -24,6 +26,22 @@ function AddProductPage() {
   const [modalVisible, setModalVisible] = useState(false);
   const [category, setCategory] = useState("Select Category");
   const [prodCategoryVisible, setProdCategoryVisible] = useState(true);
+  const [prodSpec, setProdSpec] = useState();
+
+  const [productOverview, setProductOverView] = useState({
+    name: "",
+    description: "",
+    price: "",
+  });
+
+  function inputHandler(identifier, value) {
+    setProductOverView((prevValue) => {
+      return {
+        ...prevValue,
+        [identifier]: value,
+      };
+    });
+  }
 
   const [indexPic, setIndexPic] = useState(0);
 
@@ -65,6 +83,75 @@ function AddProductPage() {
     setCategory(category);
   }
 
+  async function addProductHandler() {
+    console.log("Add clicked");
+    // console.log(Object.keys(prodSpec));
+
+    let cookie;
+    cookie = await AsyncStorage.getItem("token");
+
+    let product = {};
+    let finalProduct = {};
+
+    const keys = Object.keys(prodSpec);
+    let errorVal;
+
+    keys.map((key) => {
+      if (prodSpec[key]) {
+        product[key] = prodSpec[key];
+      } else {
+        errorVal = true;
+      }
+    });
+
+    if (errorVal) {
+      console.log("error encountered");
+    } else {
+      let finalProduct = {
+        ...product,
+        ...productOverview,
+        status: radio,
+        productCatagory: category,
+      };
+
+      const formData = new FormData();
+
+      image.map((image) => {
+        formData.append(`images`, {
+          uri: image.uri,
+          name: image.fileName,
+          type: image.type,
+        });
+      });
+
+      for (var key in finalProduct) {
+        formData.append(key, finalProduct[key]);
+      }
+
+      console.log(formData);
+      try {
+        const Req = await axios({
+          method: "POST",
+          url: `https://gabaaecom.onrender.com/api/products/addproduct`,
+          headers: {
+            Authorization: `Bearer ${cookie}`,
+            "Content-Type": "multipart/form-data",
+          },
+          data: { formData },
+          transformRequest: (data, headers) => {
+            return formData; // this is doing the trick
+          },
+        });
+
+        if (Req.data) {
+          console.log(Req.data);
+        }
+      } catch (err) {
+        console.log(err.response.data);
+      }
+    }
+  }
+
   return (
     <>
       <KeyboardAwareScrollView className="flex-1 ">
@@ -86,24 +173,30 @@ function AddProductPage() {
 
           <View>
             <TextInput
+              onChangeText={inputHandler.bind(this, "name")}
+              value={productOverview.name}
               multiline={true}
               placeholder="Name"
-              className=" border-2 h-12  text-lg py-2 px-3 my-auto rounded-lg w-[80%] ml-6"
+              className=" border-2 h-12 items-center text-lg  px-3 my-auto rounded-lg w-[80%] ml-6"
             />
           </View>
 
           <View>
             <TextInput
               multiline={true}
+              onChangeText={inputHandler.bind(this, "description")}
+              value={productOverview.description}
               placeholder="Product Description"
-              className=" border-2 h-12 text-lg py-2 px-3 my-auto rounded-lg w-[80%] ml-6"
+              className=" border-2 h-12 text-lg items-center px-3 my-auto rounded-lg w-[80%] ml-6"
             />
           </View>
           <View>
             <TextInput
               keyboardType="number-pad"
+              onChangeText={inputHandler.bind(this, "price")}
+              value={productOverview.price}
               placeholder="Price"
-              className=" border-2 h-12 text-lg py-2 px-3 my-auto rounded-lg w-[40%] ml-6"
+              className=" border-2 h-12 text-lg items-center px-3 my-auto  rounded-lg w-[40%] ml-6"
             />
           </View>
           <View className="flex-row mt-5 ml-6">
@@ -229,12 +322,17 @@ function AddProductPage() {
           ></Pressable>
           <ScrollView className="bg-gray-800  bottom-0 rounded-xl absolute w-[100%] h-[85%] ">
             {category === "Vehicles" && <VehiclesSpecPage />}
-            {category === "Electronics" && <ElectronicsSpecPage />}
+            {category === "Electronics" && (
+              <ElectronicsSpecPage
+                prodSpec={prodSpec}
+                setProdSpec={setProdSpec}
+              />
+            )}
           </ScrollView>
         </Modal>
 
         <Pressable
-          onPress={pickImage}
+          onPress={addProductHandler}
           className="rounded-lg bg-cyan-900 w-[60%] py-2 mt-6 mx-auto"
         >
           <Text className="text-xl text-center text-white ">ADD PRODUCT</Text>

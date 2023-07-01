@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const initialSignInState = {
   isLoggedIn: false,
   token: null,
@@ -11,6 +12,8 @@ const initialSignInState = {
   address: null,
   joined: null,
   fullData: {},
+  refreshPage: false,
+  newProPic: false,
 };
 
 const Sign = createSlice({
@@ -20,10 +23,12 @@ const Sign = createSlice({
     signIn(state, action) {
       console.log(action.payload);
 
-      Cookies.set("token", action.payload.token, {
-        expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-        secure: true,
-      });
+      // Cookies.set("token", action.payload.token, {
+      //   expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+      //   secure: true,
+      // });
+
+      AsyncStorage.setItem("token", action.payload.token);
 
       state.isLoggedIn = true;
       state.token = action.payload.token;
@@ -68,6 +73,14 @@ const Sign = createSlice({
       state.userEmail = action.payload.userEmail;
       state.phone = action.payload.phone;
       state.address = action.payload.address;
+    },
+
+    refreshPage(state) {
+      state.refreshPage = !state.refreshPage;
+    },
+
+    setNewProPic(state) {
+      state.newProPic = !state.newProPic;
     },
   },
 });

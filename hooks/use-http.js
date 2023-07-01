@@ -7,7 +7,7 @@ const useHttp = () => {
   //   const dispatch = useDispatch();
   let user;
   const sendRequest = async (reqConfig, applyData) => {
-    console.log(reqConfig.data);
+    console.log("this is from hook", reqConfig.data);
     try {
       user = await axios({
         method: reqConfig.method ? reqConfig.method : "GET",
@@ -21,7 +21,7 @@ const useHttp = () => {
         applyData(user.data);
       }
     } catch (err) {
-      console.log(err.response);
+      console.log(err.message);
     }
   };
 

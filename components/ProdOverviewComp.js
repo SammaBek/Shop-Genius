@@ -5,7 +5,11 @@ function ProdOverviewComp({ data }) {
   const navigation = useNavigation();
 
   function pressHandler() {
-    navigation.navigate("Product Detail", { data: data });
+    navigation.navigate("NavInsideBottom", {
+      params: { data: data },
+
+      screen: "Product Detail",
+    });
   }
   return (
     <Pressable
@@ -16,7 +20,7 @@ function ProdOverviewComp({ data }) {
         <Image
           className="object-cover w-full h-full rounded-lg "
           source={{
-            uri: `https://gabaa-app-resource.s3.amazonaws.com/${data.image[0]}`,
+            uri: `https://52c35cf06edf44f062b0.ucr.io/-/preview/1080x1920/-/format/webp/-/quality/smart_retina/-/progressive/yes/https://gabaa-app-resource.s3.amazonaws.com/${data.image[0]}`,
           }}
         />
       </View>

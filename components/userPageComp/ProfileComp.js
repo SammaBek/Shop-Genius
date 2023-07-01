@@ -1,7 +1,17 @@
-import { Pressable, Text, TextInput, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+  Image,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 function ProfileComp(props) {
   const userName = useSelector((state) => state.sign.userName);
@@ -9,9 +19,53 @@ function ProfileComp(props) {
   const userEmail = useSelector((state) => state.sign.userEmail);
   const userAddress = useSelector((state) => state.sign.address);
   const userJoined = useSelector((state) => state.sign.joined);
+  const userId = useSelector((state) => state.sign.userId);
 
+  const [products, setProducts] = useState();
+  let cookie;
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        // ${localStorage.getItem("token")}
+        cookie = await AsyncStorage.getItem("token");
+        const Req = await axios({
+          method: "GET",
+
+          url: `https://gabaaecom.onrender.com/api/products/myproducts/${userId}`,
+
+          headers: { Authorization: `Bearer ${cookie}` },
+        });
+        console.log(Req);
+        if (Req) {
+          setProducts(Req.data.user.products);
+        }
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+
+    getData();
+  }, []);
+
+  function renderProducts(itemData) {
+    return (
+      <View className="ml-1 mr-2">
+        <View className="h-32 ml-0 ">
+          <Image
+            className="object-cover w-56 h-48 rounded-lg "
+            source={{
+              uri: `https://52c35cf06edf44f062b0.ucr.io/-/preview/1080x1920/-/format/webp/-/quality/smart/-/progressive/yes/https://gabaa-app-resource.s3.amazonaws.com/${itemData.item.image[0]}`,
+            }}
+          />
+          <Text className="absolute text-lg font-bold text-white ">
+            {itemData.item.name}
+          </Text>
+        </View>
+      </View>
+    );
+  }
   return (
-    <View className="mt-16 ">
+    <View className="">
       <View className=" gap-y-7">
         <View className="flex-row gap-2 mx-auto">
           <View className="py-5  rounded-xl w-[45%] border bg-gray-900">
@@ -111,6 +165,16 @@ function ProfileComp(props) {
           </View>
         )}
       </View>
+      {!props.edit && (
+        <View className="w-full mt-10 h-52">
+          <FlatList
+            horizontal={true}
+            data={products}
+            renderItem={renderProducts}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
+      )}
     </View>
   );
 }

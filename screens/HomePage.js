@@ -33,7 +33,9 @@ function HomePage() {
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState();
   const navigation = useNavigation();
+
   useEffect(() => {
+    setSearch("");
     async function getData() {
       try {
         const mealData = await axios({
@@ -48,10 +50,6 @@ function HomePage() {
     getData();
   }, []);
 
-  // if (mealData.length != 0) {
-  //   console.log(mealData[0]);
-  // }
-
   function renderProduct(itemData) {
     return <ProdOverviewComp data={itemData.item} />;
   }
@@ -62,23 +60,25 @@ function HomePage() {
   }
 
   async function searchHandle(key) {
-    console.log("Clicked");
-
-    navigation.navigate("Searched Page");
-    // if (search) {
-    //   try {
-    //     console.log(search);
-    //     const Data = await axios({
-    //       method: "get",
-    //       url: `https://gabaaecom.onrender.com/api/products/getByName/${search}`,
-    //       headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-    //     });
-    //     console.log(Data);
-    //     setMealData(Data.data.meal);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // }
+    if (search) {
+      try {
+        console.log(search);
+        const Data = await axios({
+          method: "get",
+          url: `https://gabaaecom.onrender.com/api/products/getByName/${search}`,
+          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+        });
+        console.log("Searched Result Now");
+        console.log(Data.data);
+        // setSearchedResult(Data.data.meal);
+        navigation.navigate("NavInsideBottom", {
+          screen: "Searched Page",
+          params: { data: Data.data.meal },
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
   }
 
   function searchInputHandler(input) {

@@ -4,9 +4,14 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import profilepic from "../assets/images/profilepic.jpg";
 import TextInputWithIcon from "../components/TextInpWithIconComp";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import tw from "twrnc";
 
 function SignUpPage() {
+  const navigation = useNavigation();
+  function signInHandler() {
+    navigation.navigate("Sign In");
+  }
   return (
     <>
       <StatusBar backgroundColor="black" style="light" />
@@ -76,8 +81,8 @@ function SignUpPage() {
           <Text className="py-3 text-2xl text-center text-white">Sign Up</Text>
         </Pressable>
 
-        <Pressable className="mt-10">
-          <Text className="text-lg text-center text-gray-200 underline">
+        <Pressable onPress={signInHandler} className="mt-10">
+          <Text className="text-xl text-center text-gray-200 underline">
             Already Have An Account ? Sign In
           </Text>
         </Pressable>
