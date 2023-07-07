@@ -27,28 +27,32 @@ import ProdOverviewComp from "../components/ProdOverviewComp";
 import FilterComponent from "../components/FilterComponent";
 import FilterScreen from "./FilterScreen";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useIsFocused } from "@react-navigation/native";
 
 function HomePage() {
   const [mealData, setMealData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState();
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    setSearch("");
-    async function getData() {
-      try {
-        const mealData = await axios({
-          method: "get",
-          url: "https://gabaaecom.onrender.com/api/products",
-        });
-        setMealData(mealData.data.meal);
-      } catch {
-        console.log("encountered Error");
+    if (isFocused) {
+      setSearch("");
+      async function getData() {
+        try {
+          const mealData = await axios({
+            method: "get",
+            url: "https://gabaaecom.onrender.com/api/products",
+          });
+          setMealData(mealData.data.meal);
+        } catch {
+          console.log("encountered Error");
+        }
       }
+      getData();
     }
-    getData();
-  }, []);
+  }, [isFocused]);
 
   function renderProduct(itemData) {
     return <ProdOverviewComp data={itemData.item} />;
@@ -121,7 +125,7 @@ function HomePage() {
             </Pressable>
           </View>
           <View className="pt-4 pb-44">
-            <FlatList data={mealData} renderItem={renderProduct} />
+            <FlatList data={mealData.reverse()} renderItem={renderProduct} />
           </View>
 
           <Modal

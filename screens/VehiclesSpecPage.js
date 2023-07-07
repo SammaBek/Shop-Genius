@@ -1,6 +1,6 @@
 import { Pressable, Text, View, Modal, TextInput } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -11,12 +11,41 @@ import {
 import ButtonVehicleComp from "../components/vehicleComponents/ButtonVehicleComp";
 import SliderVehicleComp from "../components/vehicleComponents/SliderVehicleComp";
 
-function VehiclesSpecPage() {
-  const [make, setMake] = useState("Set Make");
-  const [fuel, setFuel] = useState("Set Fuel");
-  const [transmission, setTransmission] = useState("Set Transmission");
+function VehiclesSpecPage(props) {
+  const [engineSize, setEngineSize] = useState(
+    `${props.prodSpec ? props.prodSpec.engineSize : 1000}`
+  );
+  const [make, setMake] = useState(
+    `${props.prodSpec ? props.prodSpec.make : ""}`
+  );
+  const [milage, setMilage] = useState(
+    `${props.prodSpec ? props.prodSpec.milage : 0}`
+  );
+  const [fuel, setFuel] = useState(
+    `${props.prodSpec ? props.prodSpec.fuel : ""}`
+  );
+  const [transmission, setTransmission] = useState(
+    `${props.prodSpec ? props.prodSpec.transmission : ""}`
+  );
   const [modalVisible, setModalVisible] = useState(false);
   const [modalName, setModalName] = useState(undefined);
+
+  useEffect(() => {
+    if (milage || make || fuel || transmission || engineSize) {
+      props.setProdSpec({
+        milage,
+        make,
+        fuel,
+        transmission,
+        engineSize,
+      });
+    }
+  }, [milage, make, fuel, transmission, engineSize]);
+
+  function milageHandler(inp) {
+    setMilage(inp);
+    console.log(inp);
+  }
 
   return (
     <KeyboardAwareScrollView className="">
@@ -68,6 +97,8 @@ function VehiclesSpecPage() {
 
               <View className="w-[50%]">
                 <TextInput
+                  value={milage}
+                  onChangeText={milageHandler}
                   inputMode="numeric"
                   className="h-10 px-4 py-1 my-auto text-xl text-gray-100 border border-gray-100 rounded-lg"
                 />
@@ -80,7 +111,10 @@ function VehiclesSpecPage() {
               </Text>
               <View className="w-[50%] gap-y-12">
                 <View>
-                  <SliderVehicleComp />
+                  <SliderVehicleComp
+                    engineSize={engineSize}
+                    setEngineSize={setEngineSize}
+                  />
                 </View>
               </View>
             </View>

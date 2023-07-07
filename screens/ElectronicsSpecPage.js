@@ -18,6 +18,7 @@ function ElectronicsSpecPage(props) {
   );
   const [modalVisible, setModalVisible] = useState(false);
   const [phoneSpec, setPhoneSpec] = useState();
+  const [tvSpec, setTvSpec] = useState();
 
   useEffect(() => {
     if (phoneSpec && elecType) {
@@ -29,6 +30,17 @@ function ElectronicsSpecPage(props) {
       });
     }
   }, [phoneSpec, elecType]);
+
+  useEffect(() => {
+    if (tvSpec && elecType) {
+      console.log("Tv Spec Here");
+      console.log(tvSpec);
+      props.setProdSpec({
+        ...tvSpec,
+        ElectronicType: elecType,
+      });
+    }
+  }, [tvSpec, elecType]);
 
   function ElecPicker() {
     return (
@@ -72,7 +84,7 @@ function ElectronicsSpecPage(props) {
         )}
         {elecType === "TV" && (
           <View>
-            <TvSpecPage />
+            <TvSpecPage tvSpec={props.prodSpec} setTvSpec={setTvSpec} />
           </View>
         )}
         {elecType === "Laptop" && (

@@ -18,6 +18,7 @@ import VehiclesSpecPage from "./VehiclesSpecPage";
 import ElectronicsSpecPage from "./ElectronicsSpecPage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import axios from "axios";
 
 function AddProductPage() {
@@ -27,6 +28,7 @@ function AddProductPage() {
   const [category, setCategory] = useState("Select Category");
   const [prodCategoryVisible, setProdCategoryVisible] = useState(true);
   const [prodSpec, setProdSpec] = useState();
+  const navigation = useNavigation();
 
   const [productOverview, setProductOverView] = useState({
     name: "",
@@ -145,6 +147,20 @@ function AddProductPage() {
 
         if (Req.data) {
           console.log(Req.data);
+          setCategory("Select Category");
+          setImage([]);
+          setIndexPic(0);
+          setModalVisible(false);
+          setProdCategoryVisible(false);
+          setProdSpec(null);
+          setRadio("New");
+          setProductOverView({
+            name: "",
+            description: "",
+            price: "",
+          });
+
+          navigation.navigate("Home");
         }
       } catch (err) {
         console.log(err.response.data);
@@ -321,7 +337,9 @@ function AddProductPage() {
             className="flex-1 bg-gray-400 opacity-90"
           ></Pressable>
           <ScrollView className="bg-gray-800  bottom-0 rounded-xl absolute w-[100%] h-[85%] ">
-            {category === "Vehicles" && <VehiclesSpecPage />}
+            {category === "Vehicles" && (
+              <VehiclesSpecPage prodSpec={prodSpec} setProdSpec={setProdSpec} />
+            )}
             {category === "Electronics" && (
               <ElectronicsSpecPage
                 prodSpec={prodSpec}

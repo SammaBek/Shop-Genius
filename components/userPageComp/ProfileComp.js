@@ -12,6 +12,7 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { useIsFocused } from "@react-navigation/native";
 
 function ProfileComp(props) {
   const userName = useSelector((state) => state.sign.userName);
@@ -20,32 +21,34 @@ function ProfileComp(props) {
   const userAddress = useSelector((state) => state.sign.address);
   const userJoined = useSelector((state) => state.sign.joined);
   const userId = useSelector((state) => state.sign.userId);
-
+  const isFocused = useIsFocused();
   const [products, setProducts] = useState();
   let cookie;
   useEffect(() => {
-    const getData = async () => {
-      try {
-        // ${localStorage.getItem("token")}
-        cookie = await AsyncStorage.getItem("token");
-        const Req = await axios({
-          method: "GET",
+    if (isFocused) {
+      const getData = async () => {
+        try {
+          // ${localStorage.getItem("token")}
+          cookie = await AsyncStorage.getItem("token");
+          const Req = await axios({
+            method: "GET",
 
-          url: `https://gabaaecom.onrender.com/api/products/myproducts/${userId}`,
+            url: `https://gabaaecom.onrender.com/api/products/myproducts/${userId}`,
 
-          headers: { Authorization: `Bearer ${cookie}` },
-        });
-        console.log(Req);
-        if (Req) {
-          setProducts(Req.data.user.products);
+            headers: { Authorization: `Bearer ${cookie}` },
+          });
+          console.log("use Effect Run");
+          if (Req) {
+            setProducts(Req.data.user.products);
+          }
+        } catch (err) {
+          console.log(err.message);
         }
-      } catch (err) {
-        console.log(err.message);
-      }
-    };
+      };
 
-    getData();
-  }, []);
+      getData();
+    }
+  }, [isFocused]);
 
   function renderProducts(itemData) {
     return (
@@ -57,9 +60,9 @@ function ProfileComp(props) {
               uri: `https://52c35cf06edf44f062b0.ucr.io/-/preview/1080x1920/-/format/webp/-/quality/smart/-/progressive/yes/https://gabaa-app-resource.s3.amazonaws.com/${itemData.item.image[0]}`,
             }}
           />
-          <Text className="absolute text-lg font-bold text-white ">
+          {/* <Text className="absolute text-lg font-bold text-white ">
             {itemData.item.name}
-          </Text>
+          </Text> */}
         </View>
       </View>
     );
@@ -166,13 +169,20 @@ function ProfileComp(props) {
         )}
       </View>
       {!props.edit && (
-        <View className="w-full mt-10 h-52">
-          <FlatList
-            horizontal={true}
-            data={products}
-            renderItem={renderProducts}
-            keyExtractor={(item) => item.id}
-          />
+        <View>
+          <View className="h-10 mx-auto mt-4">
+            <Text className="text-lg">{`Here are your Products (${
+              products ? products.length : ""
+            })`}</Text>
+          </View>
+          <View className="w-full h-52">
+            <FlatList
+              horizontal={true}
+              data={products ? products.reverse() : []}
+              renderItem={renderProducts}
+              keyExtractor={(item) => item.id}
+            />
+          </View>
         </View>
       )}
     </View>

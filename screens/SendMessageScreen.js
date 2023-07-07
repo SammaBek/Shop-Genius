@@ -35,6 +35,7 @@ function SendMessageScreen() {
   const [message, setMessage] = useState();
   const { sendRequest } = useHttp();
   const Route = useRoute();
+  const navigation = useNavigation();
   const data = Route.params.data;
   console.log("Here is Data");
   console.log(data);
@@ -160,7 +161,15 @@ function SendMessageScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <View className="pt-10 pb-4">
+      <View className="flex flex-row pt-3 pb-4">
+        <Pressable
+          onPress={() =>
+            navigation.navigate("MessageNav", { screen: "MessageList" })
+          }
+          className="flex flex-row w-20 ml-5"
+        >
+          <Ionicons size={24} name="arrow-back" />
+        </Pressable>
         <Text className="text-2xl font-bold text-center text-black">
           {`Chat with ${data.name}`}
         </Text>
